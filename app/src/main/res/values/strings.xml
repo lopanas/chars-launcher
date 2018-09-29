@@ -33,21 +33,23 @@
     <string name="dark_scheme">Dark Scheme</string>
     <string name="light_scheme">Light Scheme</string>
 
-    <string name="dark_1">Dark 1</string>
-    <string name="dark_2">Dark 2</string>
-    <string name="dark_3">Dark 3</string>
-    <string name="dark_4">Dark 4</string>
-    <string name="dark_5">Dark 5</string>
-    <string name="dark_6">Dark 6</string>
-    <string name="dark_7">Dark 7</string>
+    <string-array name="background_names">
+        <item>Dark 1</item>
+        <item>Dark 2</item>
+        <item>Dark 3</item>
+        <item>Dark 4</item>
+        <item>Dark 5</item>
+        <item>Dark 6</item>
+        <item>Dark 7</item>
 
-    <string name="light_1">Light 1</string>
-    <string name="light_2">Light 2</string>
-    <string name="light_3">Light 3</string>
-    <string name="light_4">Light 4</string>
-    <string name="light_5">Light 5</string>
-    <string name="light_6">Light 6</string>
-    <string name="light_7">Light 7</string>
+        <item>Light 1</item>
+        <item>Light 2</item>
+        <item>Light 3</item>
+        <item>Light 4</item>
+        <item>Light 5</item>
+        <item>Light 6</item>
+        <item>Light 7</item>
+    </string-array>
 
     <string name="sample_clock">Sample Clock Display</string>
     <string name="clock_invisible">invisible</string>
@@ -144,5 +146,4 @@
     <string name="letter_0">0</string>
     <string name="key_delete">&#8855;</string>
     <string name="key_menu">&#8801;</string>
-
 </resources>
