@@ -8,16 +8,14 @@ import com.archbrey.letters.Preferences.SettingsActivity;
 //import android.widget.RelativeLayout;
 
 
-public class DrawDrawerBox  {
-
-    private static Context getViewContext;
+public class DrawDrawerBox {
+    private Context getViewContext;
     private static AppItem[] showItem;
-    private static AppDrawerAdapter AppDrawerAdapterObject;
-    private static GridView appGridView;
-    private static GlobalHolder global;
+    private AppDrawerAdapter AppDrawerAdapterObject;
+    private GridView appGridView;
+    private GlobalHolder global;
 
-    public DrawDrawerBox (Context c, GridView getAppGridView, AppItem[] appItem)  {
-
+    public DrawDrawerBox(Context c, GridView getAppGridView, AppItem[] appItem) {
         getViewContext = c;
         showItem = appItem;
         appGridView = getAppGridView;
@@ -28,29 +26,24 @@ public class DrawDrawerBox  {
         appGridView.setAdapter(AppDrawerAdapterObject);
         appGridView.setBackgroundColor(SettingsActivity.backerColor);
         appGridView.setNumColumns(SettingsActivity.drawerColumns);
-
     } // public DrawDrawerBox (Context c, AppItem[] appItem)
 
 
     public void DrawBox(AppItem[] passedApps) {
-
         showItem = passedApps;
         AppDrawerAdapterObject.passinto(passedApps);
         appGridView.setAdapter(AppDrawerAdapterObject);
         appGridView.setBackgroundColor(SettingsActivity.backerColor);
         appGridView.setNumColumns(SettingsActivity.drawerColumns);
-
     } //public void DrawBox()
 
 
     public void setListener() {
-
         PackageManager pm;
 
-        pm=global.getPackageManager();
+        pm = global.getPackageManager();
         appGridView.setOnItemClickListener(new DrawerClickListener(getViewContext, showItem, pm));
         appGridView.setOnItemLongClickListener(new DrawerLongClickListener(getViewContext, showItem, pm));
-
     }
 
 } //public class DrawDrawerBox
