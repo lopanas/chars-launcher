@@ -20,14 +20,27 @@
     <string name="unassigned"> (unassigned) </string>
 
     <string name="settings">Settings</string>
+
+    <!-- The order of the items need to match the the cases on 'onItemClick' in MainSettings -->
+    <string-array name="setting_items">
+        <item>Background Color</item>
+        <item>Clock Visibility</item>
+        <item>Drawer Columns</item>
+        <item>Drawer Text Size</item>
+        <item>Filter Bar</item>
+        <item>Filter Labels</item>
+        <item>Keypad Height</item>
+        <item>Landscape Handedness</item>
+    </string-array>
+
     <string name="color_scheme">Background Color</string>
+    <string name="custom_clock">Clock Visibility</string>
     <string name="change_columns">Drawer Columns</string>
     <string name="drawer_textsize">Drawer Text Size</string>
+    <string name="enable_filter">Filter Bar</string>
     <string name="custom_filter">Filter Labels</string>
-    <string name="enable_filter">Filter bar</string>
     <string name="custom_keypad">Keypad Height</string>
-    <string name="custom_clock">Clock Visibility</string>
-    <string name="handedness">Landscape handedness</string>
+    <string name="handedness">Landscape Handedness</string>
     <string name="set_wallpaper">Wallpaper</string>
 
     <string name="dark_scheme">Dark Scheme</string>
@@ -97,7 +110,6 @@
     <string name="system">-Main-</string>
     <string name="wifi">Wifi</string>
     <string name="wireless">Wireless</string>
-
 
     <string name="enable">enable</string>
     <string name="disable">disable</string>
