@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.archbrey.letters" >
+    package="com.archbrey.letters">
 
-    <uses-permission
-        android:name="android.permission.WRITE_SETTINGS"
-        android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
-        android:protectionLevel="normal" />
-    
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name="com.archbrey.letters.LaunchpadActivity"
             android:clearTaskOnLaunch="true"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@android:style/Theme.DeviceDefault.Wallpaper.NoTitleBar" >
+            android:theme="@android:style/Theme.DeviceDefault.Wallpaper.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -30,7 +26,7 @@
             android:clearTaskOnLaunch="true"
             android:label="@string/app_preferences"
             android:launchMode="singleTask"
-            android:theme="@android:style/Theme.DeviceDefault.Wallpaper.NoTitleBar" >
+            android:theme="@android:style/Theme.DeviceDefault.Wallpaper.NoTitleBar">
             <intent-filter>
                 <action android:name="com.archbrey.letters.Preferences.SettingsActivity" />
 
@@ -38,6 +34,4 @@
             </intent-filter>
         </activity>
     </application>
-
-
 </manifest>
