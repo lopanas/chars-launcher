@@ -272,46 +272,46 @@ public class ClockOut {
     }
 
     private void refreshGestures() {
-        String upLeftLabel = gestureShortcuts[UP_LEFTSIDE].shortcutLabel;
-        String upRightLabel = gestureShortcuts[UP_RIGHTSIDE].shortcutLabel;
-        String downLeftLabel = gestureShortcuts[DN_LEFTSIDE].shortcutLabel;
-        String downRightLabel = gestureShortcuts[DN_RIGHTSIDE].shortcutLabel;
-
         leftGestures.setText("\n");
         rightGestures.setText("\n");
 
-        if (upLeftLabel != null && upLeftLabel.length() > 1) {
-            leftGestures.append(
-                    String.valueOf(Character.toChars(8593))
-                            + " "
-                            + upLeftLabel
-            );
-        }
+        setGestureLabel(leftGestures, gestureShortcuts[UP_LEFTSIDE].shortcutLabel, 0);
+        setGestureLabel(rightGestures, gestureShortcuts[UP_RIGHTSIDE].shortcutLabel, 1);
+        setGestureLabel(leftGestures, gestureShortcuts[DN_LEFTSIDE].shortcutLabel, 2);
+        setGestureLabel(rightGestures, gestureShortcuts[DN_RIGHTSIDE].shortcutLabel, 3);
+    }
 
-        if (upRightLabel != null && upRightLabel.length() > 1) {
-            rightGestures.append(
-                    upRightLabel
-                            + " "
-                            + String.valueOf(Character.toChars(8593))
-            );
-        }
+    private void setGestureLabel(TextView gestures, String label, int position) {
+        String iconUp = String.valueOf(Character.toChars(8593));
+        String iconDown = String.valueOf(Character.toChars(8595));
+        String start = "";
+        String end = "";
 
-        if (downLeftLabel != null && downLeftLabel.length() > 1) {
-            leftGestures.append(
-                    "\n"
-                            + String.valueOf(Character.toChars(8595))
-                            + " "
-                            + downLeftLabel
-            );
-        }
+        if (label != null && label.length() > 1) {
+            switch (position) {
+                case 0: // Top left
+                    start = iconUp;
+                    end = label;
+                    break;
+                case 1: // Top right
+                    start = label;
+                    end = iconUp;
+                    break;
+                case 2: // Bottom left
+                    gestures.append("\n");
+                    start = iconDown;
+                    end = label;
+                    break;
+                case 3: // Bottom right
+                    gestures.append("\n");
+                    start = label;
+                    end = iconDown;
+                    break;
+                default:
+                    break;
+            }
 
-        if (downRightLabel != null && downRightLabel.length() > 1) {
-            rightGestures.append(
-                    "\n"
-                            + downRightLabel
-                            + " "
-                            + String.valueOf(Character.toChars(8595))
-            );
+            gestures.append(start + " " + end);
         }
     }
 
@@ -364,18 +364,17 @@ public class ClockOut {
                         float currentX = event.getRawX();
                         float currentY = event.getRawY();
 
-                        int action = MotionEventCompat.getActionMasked(event);
+                        int action = event.getActionMasked();
                         switch (action) {
                             case (MotionEvent.ACTION_DOWN):
                                 initialTouchX = currentX;
                                 initialTouchY = currentY;
                                 msghandler.removeCallbacks(lingerMsg);
                                 popSelectHandler.removeCallbacks(triggerPopMenu);
-                                touchOrientation = 0; //reset to unknown touch orientation
+                                touchOrientation = 0; // Reset to unknown touch orientation
                                 popSelectHandler.postDelayed(triggerPopMenu, 1500);
                                 return true;
                             case (MotionEvent.ACTION_MOVE):
-                                //if (touchOrientation==0) popSelectHandler.postDelayed(triggerPopMenu, 500);
                                 if ((touchOrientation == 0) || (touchOrientation == 1))
                                     determineVerticalGesture(currentY);
                                 return true;
@@ -392,7 +391,7 @@ public class ClockOut {
         );
     }
 
-    public void RetrieveSavedShortcuts(Context getContext) {
+    void RetrieveSavedShortcuts(Context getContext) {
         allApps = global.getAllAppItems();
         mainContext = getContext;
         DBHelper dbHandler = new DBHelper(mainContext);
@@ -403,10 +402,10 @@ public class ClockOut {
             gestureShortcuts[inc].shortcutPackage = " ";
             gestureShortcuts[inc].shortcutLabel = " ";
 
-            for (AppItem allApp : allApps) {
-                if (shortcutFound.equals(allApp.pkgname)) {
-                    gestureShortcuts[inc].shortcutLabel = allApp.label;
-                    gestureShortcuts[inc].shortcutPackage = allApp.pkgname;
+            for (AppItem app : allApps) {
+                if (shortcutFound.equals(app.pkgname)) {
+                    gestureShortcuts[inc].shortcutLabel = app.label;
+                    gestureShortcuts[inc].shortcutPackage = app.pkgname;
                     break;
                 }
             }
