@@ -2,6 +2,8 @@ package com.archbrey.letters;
 
 //import android.app.Activity;
 //import android.app.Instrumentation;
+
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +13,7 @@ import android.content.res.Resources;
 import android.graphics.Point;
 //import android.net.Uri;
 import android.os.Handler;
-import android.provider.Settings;
+//import android.provider.Settings;
 import android.support.v4.view.MotionEventCompat;
 //import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -21,7 +23,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridView;
+//import android.widget.GridView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -37,63 +39,48 @@ import java.util.Locale;
 
 public class ClockOut {
 
-    public static GlobalHolder global;
+    public GlobalHolder global;
 
-    public static RelativeLayout clockoutBox;
+    public RelativeLayout clockoutBox;
 
-    public static TextView clockView;
-    public static TextView dateView;
+    public TextView clockView;
+    private TextView dateView;
 
-    private static TextView leftGestures;
-    private static TextView rightGestures;
+    private TextView leftGestures;
+    private TextView rightGestures;
 
-    private static Context mainContext;
+    private Context mainContext;
     private static Resources rClockout;
-
-
-  //  private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-  //  private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
 
     private float initialTouchX;
     private float initialTouchY;
-    private static int screenWidth;
     private static int screenHeight;
-   // private static int screenHeight;
 
     private static Handler msghandler;
     private static Runnable lingerMsg;
 
-    private static Handler autoBrighthandler;
-    private static Runnable enableAutoBright;
-
     private static Handler popSelectHandler;
     private static Runnable triggerPopMenu;
 
-    private static SimpleDateFormat dateFormat ;
-    private static SimpleDateFormat timeFormat ;
+    private static SimpleDateFormat dateFormat;
+    private static SimpleDateFormat timeFormat;
 
     private final int TAP_CLOCK = 50;
     private final int UP_LEFTSIDE = 51;
-    private final int DN_LEFTSIDE = 52;
-    private final int UP_RIGHTSIDE = 53;
+    private final int UP_RIGHTSIDE = 52;
+    private final int DN_LEFTSIDE = 53;
     private final int DN_RIGHTSIDE = 54;
 
-    PackageManager pmForClock;
+    private PackageManager pmForClock;
 
-    public static int swipeType;
-   // public static String gestureName;
+    private static int swipeType;
 
     private static int touchOrientation; //0 for unset, 1 for vertical, 2 for horizontal
 
-    Locale loc;
-
-
     private static AppItem[] allApps;
-    public static GestureShortcut[] gestureShortcuts;
+    static GestureShortcut[] gestureShortcuts;
 
-    public ClockOut() {
-
+    ClockOut() {
         global = new GlobalHolder();
         mainContext = global.getMainContext();
         pmForClock = global.getPackageManager();
@@ -103,91 +90,85 @@ public class ClockOut {
         leftGestures = new TextView(mainContext);
         rightGestures = new TextView(mainContext);
         clockoutBox = new RelativeLayout(mainContext);
-
         rClockout = global.getResources();
-        loc = rClockout.getConfiguration().locale;
+
+        Locale loc = rClockout.getConfiguration().getLocales().get(0);
         dateFormat = new SimpleDateFormat("yyyy-MM-dd", loc);
         timeFormat = new SimpleDateFormat("HH:mm", loc);
 
         swipeType = 0;
 
         gestureShortcuts = new GestureShortcut[55];
-        for (int inc=50; inc<=54; inc++){
+        for (int inc = 50; inc <= 54; inc++) {
             gestureShortcuts[inc] = new GestureShortcut();
             switch (inc) {
                 case TAP_CLOCK:
-                    gestureShortcuts[inc].typeName= rClockout.getString(R.string.tap_clock);
+                    gestureShortcuts[inc].typeName = rClockout.getString(R.string.tap_clock);
                     break;
                 case UP_LEFTSIDE:
-                    gestureShortcuts[inc].typeName= String.valueOf(Character.toChars(8593)) + " " +rClockout.getString(R.string.left_side);
-                    break;
-                case DN_LEFTSIDE:
-                    gestureShortcuts[inc].typeName=String.valueOf(Character.toChars(8595)) + " " +rClockout.getString(R.string.left_side);
+                    gestureShortcuts[inc].typeName = String.valueOf(Character.toChars(8593))
+                            + " "
+                            + rClockout.getString(R.string.left_side);
                     break;
                 case UP_RIGHTSIDE:
-                    gestureShortcuts[inc].typeName=String.valueOf(Character.toChars(8593)) + " " + rClockout.getString(R.string.right_side);
+                    gestureShortcuts[inc].typeName = String.valueOf(Character.toChars(8593))
+                            + " "
+                            + rClockout.getString(R.string.right_side);
+                    break;
+                case DN_LEFTSIDE:
+                    gestureShortcuts[inc].typeName = String.valueOf(Character.toChars(8595))
+                            + " "
+                            + rClockout.getString(R.string.left_side);
                     break;
                 case DN_RIGHTSIDE:
-                    gestureShortcuts[inc].typeName=String.valueOf(Character.toChars(8595)) + " " + rClockout.getString(R.string.right_side);
+                    gestureShortcuts[inc].typeName = String.valueOf(Character.toChars(8595))
+                            + " "
+                            + rClockout.getString(R.string.right_side);
                     break;
-            } //switch (inc)
-        } //for (int inc=50; inc<=54; inc++)
+            }
+        }
 
         msghandler = new Handler();
         lingerMsg = new Runnable() {
             public void run() {
                 refreshClock();
-            } // public void run()
-        }; //lingerMsg = new Runnable()
-
-        autoBrighthandler = new Handler();
-        enableAutoBright = new Runnable() {
-            public void run() {
-                Settings.System.putInt(mainContext.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
-                clockView.setText(rClockout.getString(R.string.display));
-            } // public void run()
-        }; //lingerMsg = new Runnable()
-
-
+            }
+        };
 
         popSelectHandler = new Handler();
-        triggerPopMenu = new Runnable(){
+        triggerPopMenu = new Runnable() {
             public void run() {
-                popSelectBox ();
-            } // public void run()
-        }; //triggerPopMenu = new Runnable()
+                popSelectBox();
+            }
+        };
+    }
 
-    } //public TypeOut(
-
-    public RelativeLayout DrawBox(RelativeLayout getTypeoutBox,Resources getR){
-
-
+    @SuppressLint("RtlHardcoded")
+    public RelativeLayout DrawBox(RelativeLayout getTypeoutBox, Resources getR) {
         clockoutBox = getTypeoutBox;
 
-        //rClockout = getR;
         int clockTextSize = 80;
         int dateTextSize = 20;
         int gestureInfoSize = 12;
 
         int clockTop_margin = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,200,
-                getR.getDisplayMetrics());
+                TypedValue.COMPLEX_UNIT_DIP, 200, getR.getDisplayMetrics()
+        );
 
         int dateTop_margin = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 15,
-                getR.getDisplayMetrics());
+                TypedValue.COMPLEX_UNIT_DIP, 15, getR.getDisplayMetrics()
+        );
 
         int gestureInfo_margin = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 10,
-                getR.getDisplayMetrics());
+                TypedValue.COMPLEX_UNIT_DIP, 10, getR.getDisplayMetrics()
+        );
 
-
-        clockView.setText("19:30");
+        clockView.setText("04:20");
         clockView.setGravity(Gravity.CENTER_HORIZONTAL);
         clockView.setTextSize(TypedValue.COMPLEX_UNIT_SP, clockTextSize);
         clockView.setTextColor(SettingsActivity.textColor);
 
-        dateView.setText("29 Jul 2015 \n newline");
+        dateView.setText("07 Oct 2018");
         dateView.setGravity(Gravity.CENTER_HORIZONTAL);
         dateView.setTextSize(TypedValue.COMPLEX_UNIT_SP, dateTextSize);
         dateView.setTextColor(SettingsActivity.textColor);
@@ -205,31 +186,37 @@ public class ClockOut {
         clockView.setId(R.id.clockView);
 
         RelativeLayout.LayoutParams clockviewParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT, //width
-                RelativeLayout.LayoutParams.WRAP_CONTENT); //height
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
 
         clockviewParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-       // clockviewParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         clockviewParams.addRule(RelativeLayout.CENTER_VERTICAL);
         clockviewParams.setMargins(0, clockTop_margin, 0, 0);
 
         RelativeLayout.LayoutParams dateviewParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT, //width
-                RelativeLayout.LayoutParams.WRAP_CONTENT); //height
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+
         dateviewParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
         dateviewParams.addRule(RelativeLayout.BELOW, clockView.getId());
         dateviewParams.setMargins(0, dateTop_margin, 0, 0);
 
         RelativeLayout.LayoutParams leftGestureParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT, //width
-                RelativeLayout.LayoutParams.WRAP_CONTENT); //height
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+
         leftGestureParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         leftGestureParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         leftGestureParams.setMargins(gestureInfo_margin, 0, 0, gestureInfo_margin);
 
         RelativeLayout.LayoutParams rightGestureParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT, //width
-                RelativeLayout.LayoutParams.WRAP_CONTENT); //height
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+
         rightGestureParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         rightGestureParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         rightGestureParams.setMargins(0, 0, gestureInfo_margin, gestureInfo_margin);
@@ -240,111 +227,137 @@ public class ClockOut {
         clockoutBox.addView(leftGestures, leftGestureParams);
         clockoutBox.addView(rightGestures, rightGestureParams);
 
-        //refreshClock();
-
         Display display = LaunchpadActivity.mainActivity.getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        screenWidth = size.x;
         screenHeight = size.y;
 
         return clockoutBox;
+    }
 
-    } //public RelativeLayout DrawBox(RelativeLayout getTypeoutBox,Context c,Resources getR)
+    void refreshClock() {
+        Calendar calendar = Calendar.getInstance();
 
-    public void refreshClock(){
+        clockView.setText(timeFormat.format(calendar.getTime()));
+        dateView.setText(dateFormat.format(calendar.getTime()));
+        dateView.append("\n");
 
-        Calendar c = Calendar.getInstance();
-
-        clockView.setText(timeFormat.format(c.getTime()));
-        dateView.setText(dateFormat.format(c.getTime()) + "\n");
-        int day = c.get(Calendar.DAY_OF_WEEK);
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
 
         switch (day) {
-            case Calendar.SUNDAY: dateView.append(rClockout.getString(R.string.sun)); break;
-            case Calendar.MONDAY: dateView.append(rClockout.getString(R.string.mon)); break;
-            case Calendar.TUESDAY: dateView.append(rClockout.getString(R.string.tue)); break;
-            case Calendar.WEDNESDAY: dateView.append(rClockout.getString(R.string.wed)); break;
-            case Calendar.THURSDAY: dateView.append(rClockout.getString(R.string.thu)); break;
-            case Calendar.FRIDAY: dateView.append(rClockout.getString(R.string.fri)); break;
-            case Calendar.SATURDAY: dateView.append(rClockout.getString(R.string.sat)); break;
-        } //switch (day)
+            case Calendar.SUNDAY:
+                dateView.append(rClockout.getString(R.string.sun));
+                break;
+            case Calendar.MONDAY:
+                dateView.append(rClockout.getString(R.string.mon));
+                break;
+            case Calendar.TUESDAY:
+                dateView.append(rClockout.getString(R.string.tue));
+                break;
+            case Calendar.WEDNESDAY:
+                dateView.append(rClockout.getString(R.string.wed));
+                break;
+            case Calendar.THURSDAY:
+                dateView.append(rClockout.getString(R.string.thu));
+                break;
+            case Calendar.FRIDAY:
+                dateView.append(rClockout.getString(R.string.fri));
+                break;
+            case Calendar.SATURDAY:
+                dateView.append(rClockout.getString(R.string.sat));
+                break;
+        }
 
-       // DisplayMetrics metrics = new DisplayMetrics();
+        refreshGestures();
+    }
 
+    private void refreshGestures() {
+        String upLeftLabel = gestureShortcuts[UP_LEFTSIDE].shortcutLabel;
+        String upRightLabel = gestureShortcuts[UP_RIGHTSIDE].shortcutLabel;
+        String downLeftLabel = gestureShortcuts[DN_LEFTSIDE].shortcutLabel;
+        String downRightLabel = gestureShortcuts[DN_RIGHTSIDE].shortcutLabel;
 
         leftGestures.setText("\n");
-        if (gestureShortcuts[UP_LEFTSIDE].shortcutPackage.length()>5) leftGestures.append(String.valueOf(Character.toChars(8593))
-                                                                                            + " "
-                                                                                            + gestureShortcuts[UP_LEFTSIDE].shortcutLabel);
-        if (gestureShortcuts[DN_LEFTSIDE].shortcutPackage.length()>5) leftGestures.append("\n" + String.valueOf(Character.toChars(8595))
-                                                                                             + " "
-                                                                                             + gestureShortcuts[DN_LEFTSIDE].shortcutLabel);
-
         rightGestures.setText("\n");
-        if (gestureShortcuts[UP_RIGHTSIDE].shortcutPackage.length()>5) rightGestures.append(gestureShortcuts[UP_RIGHTSIDE].shortcutLabel
-                                                    + " "
-                + String.valueOf(Character.toChars(8593)) );
 
-        if (gestureShortcuts[DN_RIGHTSIDE].shortcutPackage.length()>5) rightGestures.append("\n" +gestureShortcuts[DN_RIGHTSIDE].shortcutLabel
-                                                     + " "
-                                                    + String.valueOf(Character.toChars(8595)) );
+        if (upLeftLabel != null && upLeftLabel.length() > 1) {
+            leftGestures.append(
+                    String.valueOf(Character.toChars(8593))
+                            + " "
+                            + upLeftLabel
+            );
+        }
 
+        if (upRightLabel != null && upRightLabel.length() > 1) {
+            rightGestures.append(
+                    upRightLabel
+                            + " "
+                            + String.valueOf(Character.toChars(8593))
+            );
+        }
 
-    } //public void refreshClock()
+        if (downLeftLabel != null && downLeftLabel.length() > 1) {
+            leftGestures.append(
+                    "\n"
+                            + String.valueOf(Character.toChars(8595))
+                            + " "
+                            + downLeftLabel
+            );
+        }
 
+        if (downRightLabel != null && downRightLabel.length() > 1) {
+            rightGestures.append(
+                    "\n"
+                            + downRightLabel
+                            + " "
+                            + String.valueOf(Character.toChars(8595))
+            );
+        }
+    }
 
-    public void setListener(){
-
+    public void setListener() {
         clockView.setOnClickListener(
                 new View.OnClickListener() {
-                    public void onClick(View v) { //perform action of click
+                    public void onClick(View v) {
+                        Intent launchIntent = pmForClock.getLaunchIntentForPackage(
+                                gestureShortcuts[TAP_CLOCK].shortcutPackage
+                        );
 
-                        Intent launchIntent = pmForClock.getLaunchIntentForPackage(gestureShortcuts[TAP_CLOCK].shortcutPackage);
                         if (launchIntent != null) {
                             global.getMainContext().startActivity(launchIntent);
-
-                        } else //if (launchIntent.resolveActivity(pmForListener) != null)
-                        {
+                        } else {
                             shortcutPicker(TAP_CLOCK);
-                        } //else of  if (launchIntent.resolveActivity(pmForGesture) != null)
-
-
-                    } //public void OnClick(View v)
-                } //new Button.OnClickListener()
-        ); //findToggleView.Key.setOnClickListener
+                        }
+                    }
+                }
+        );
 
         clockView.setOnLongClickListener(
                 new View.OnLongClickListener() {
-                    public boolean onLongClick(View v) { //perform action of click
+                    public boolean onLongClick(View v) {
                         shortcutPicker(TAP_CLOCK);
                         return true;
-                    } //public void OnClick(View v)
-                } //new Button.OnClickListener()
-        ); //findToggleView.Key.setOnClickListener
-
-
+                    }
+                }
+        );
 
         dateView.setOnClickListener(
                 new View.OnClickListener() {
-                    public void onClick(View v) { //perform action of click
-
+                    public void onClick(View v) {
                         Intent calendarIntent = new Intent(Intent.ACTION_MAIN);
                         calendarIntent.addCategory(Intent.CATEGORY_APP_CALENDAR);
+
                         try {
                             mainContext.startActivity(calendarIntent);
                         } catch (ActivityNotFoundException anfe) {
                             // Log.d(TAG, "Google Voice Search is not found");
-                        } //try - catch
+                        }
+                    }
+                }
+        );
 
-                    } //public void OnClick(View v)
-                } //new Button.OnClickListener()
-        ); //findToggleView.Key.setOnClickListener
-
-        //use the whole main screen instead of just the clock area to listen to gestures
-        //LaunchpadActivity.clockoutBox.setOnTouchListener(
+        // Use the whole main screen instead of just the clock area to listen to gestures
         LaunchpadActivity.mainScreen.setOnTouchListener(
-
                 new View.OnTouchListener() {
                     public boolean onTouch(View v, MotionEvent event) {
 
@@ -363,217 +376,141 @@ public class ClockOut {
                                 return true;
                             case (MotionEvent.ACTION_MOVE):
                                 //if (touchOrientation==0) popSelectHandler.postDelayed(triggerPopMenu, 500);
-                                if ((touchOrientation==0)||(touchOrientation==2)) determineBrightness(currentX);
-                                if ((touchOrientation==0)||(touchOrientation==1)) determineVerticalGesture(currentY);
+                                if ((touchOrientation == 0) || (touchOrientation == 1))
+                                    determineVerticalGesture(currentY);
                                 return true;
                             case (MotionEvent.ACTION_UP):
                                 msghandler.postDelayed(lingerMsg, 500);
-                               // autoBrighthandler.removeCallbacks(enableAutoBright);
                                 popSelectHandler.removeCallbacks(triggerPopMenu);
-                                if (touchOrientation==1) evaluateGesture();
+                                if (touchOrientation == 1) evaluateGesture();
                                 return true;
                             default:
                                 return true;
-                        }//switch(action)
-                    } //public boolean onTouch(View v, MotionEvent event)
-                } //new OnTouchListener()
-        );//filterItems[inc].button.setOnTouchListener
+                        }
+                    }
+                }
+        );
+    }
 
-
-    } //public void setListener()
-
-
-    public void RetrieveSavedShortcuts (Context getContext) {
-
+    public void RetrieveSavedShortcuts(Context getContext) {
         allApps = global.getAllAppItems();
         mainContext = getContext;
         DBHelper dbHandler = new DBHelper(mainContext);
 
-        for (int inc=50; inc<=54; inc++) {
-
+        for (int inc = 50; inc <= 54; inc++) {
             String shortcutFound = dbHandler.RetrievePackage(inc);
 
-            //assign " " by default and fill this up if shortcut exists
             gestureShortcuts[inc].shortcutPackage = " ";
             gestureShortcuts[inc].shortcutLabel = " ";
-            for (int appInc=0; appInc<allApps.length; appInc++) {
 
-                if (shortcutFound.equals(allApps[appInc].pkgname)  ){
-                    gestureShortcuts[inc].shortcutLabel = allApps[appInc].label;
-                    gestureShortcuts[inc].shortcutPackage = allApps[appInc].pkgname;
+            for (AppItem allApp : allApps) {
+                if (shortcutFound.equals(allApp.pkgname)) {
+                    gestureShortcuts[inc].shortcutLabel = allApp.label;
+                    gestureShortcuts[inc].shortcutPackage = allApp.pkgname;
                     break;
-                } //if (DrawKeypadBox.keypadButton[inc].ShortcutPackage.equals(allApps[appInc].pkgname)  )
+                }
+            }
+        }
 
-            } //(int appInc=0; appInc<allApps.length; appInc++)
+        dbHandler.close();
+    }
 
-        } //for (int inc=50; inc<=54; inc++)
-
-    } // public class RetrieveSavedShortcuts ()
-
-    private void evaluateGesture(){
-
-        GestureShortcut launchGesture;
-
-        //gestureName=" ";
-
-        launchGesture = new GestureShortcut();
-        launchGesture = gestureShortcuts[swipeType];
+    private void evaluateGesture() {
+        GestureShortcut launchGesture = gestureShortcuts[swipeType];
 
         Intent launchIntent = pmForClock.getLaunchIntentForPackage(launchGesture.shortcutPackage);
+
         if (launchIntent != null) {
             global.getMainContext().startActivity(launchIntent);
+        }
+    }
 
-        } //if (launchIntent != null)
-       /* else //if (launchIntent.resolveActivity(pmForListener) != null)
-        {
-            shortcutPicker(swipeType);
-        } //else of  if (launchIntent.resolveActivity(pmForGesture) != null)*/
+    private void determineVerticalGesture(float getCurrentY) {
+        float movementY;
+        int boxWidth;
+        int boxLocation[];
+        boxLocation = new int[2];
 
+        boxWidth = LaunchpadActivity.clockoutBox.getWidth();
+        LaunchpadActivity.clockoutBox.getLocationOnScreen(boxLocation);
 
-    } //private void evaluateGesture()
+        movementY = (getCurrentY - initialTouchY) / screenHeight;
 
-
-    private void determineVerticalGesture(float getCurrentY){
-
-    float movementY;
-    int boxWidth;
-    int boxLocation[];
-    boxLocation = new int[2];
-
-    boxWidth = LaunchpadActivity.clockoutBox.getWidth();
-    LaunchpadActivity.clockoutBox.getLocationOnScreen(boxLocation);
-
-    movementY = (getCurrentY - initialTouchY)/screenHeight;
-
-        if(Math.abs(movementY)>=0.075) {
+        if (Math.abs(movementY) >= 0.075) {
             popSelectHandler.removeCallbacks(triggerPopMenu);
-            touchOrientation = 1; //lock to only sense vertical movement
+            touchOrientation = 1; // Lock to vertical movement
 
-           //if(initialTouchX>screenWidth/2) { //if on right side
-            if((initialTouchX-boxLocation[0])>boxWidth/2) { //if on right side
-                if (movementY>0) swipeType = DN_RIGHTSIDE;
-                if (movementY<0) swipeType = UP_RIGHTSIDE;
-            }else { //if on left side
-                if (movementY>0) swipeType = DN_LEFTSIDE;
-                if (movementY<0) swipeType = UP_LEFTSIDE;
+            if ((initialTouchX - boxLocation[0]) < boxWidth / 2) {
+                if (movementY < 0) swipeType = UP_LEFTSIDE;
+                if (movementY > 0) swipeType = DN_LEFTSIDE;
+            } else {
+                if (movementY < 0) swipeType = UP_RIGHTSIDE;
+                if (movementY > 0) swipeType = DN_RIGHTSIDE;
             }
+        }
+    }
 
-        } //if(Math.abs(movementY)>=0.05)
-
-    } //private void determineVerticalGesture(float getCurrentY)
-
-
-    private void determineBrightness(float getCurrentX) {
-
-        int curBrightness = android.provider.Settings.System.getInt(mainContext.getContentResolver(), android.provider.Settings.System.SCREEN_BRIGHTNESS,-1);
-        float movementX;
-       // float screenPosition;
-        float adjBrightness;
-        int newBrightness;
-        int newPercent;
-       // int movPercent;
-
-        //screenPosition = getCurrentX /screenWidth;
-        movementX = (getCurrentX - initialTouchX)/screenWidth;
-       // movPercent = (int)(movementX*100);
-
-        float curPercent = ((float)curBrightness/255f);
-
-        if(Math.abs(movementX)>=0.05) {
-
-           // autoBrighthandler.removeCallbacks(enableAutoBright);
-           // autoBrighthandler.postDelayed(enableAutoBright, 700);
-            popSelectHandler.removeCallbacks(triggerPopMenu);
-            touchOrientation = 2; //lock to only sense horizontal movement
-            dateView.setText(rClockout.getString(R.string.display));
-            adjBrightness = (curPercent+movementX);
-            if (adjBrightness>=1) adjBrightness = 1;
-            if (adjBrightness<=0) adjBrightness = 0;
-
-            newBrightness = (int)(255*(adjBrightness));
-            newPercent =(int)(100*(adjBrightness));
-
-            clockView.setText(String.valueOf(newPercent) + "%");
-
-            Settings.System.putInt(mainContext.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-            Settings.System.putInt(mainContext.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, newBrightness);
-
-            initialTouchX =  getCurrentX;
-
-        } //if(Math.abs(movement)>=0.05)
-
-    } //private void refreshBrightness(float getCurrentX)
-
-
-    public void shortcutPicker(int getSwipeType){
-
+    void shortcutPicker(int getSwipeType) {
         TypeOut.editMode = getSwipeType;
-        LaunchpadActivity.hideDrawerAllApps = false;
 
+        LaunchpadActivity.hideDrawerAllApps = false;
         LaunchpadActivity.keypadBox.setVisibility(View.GONE);
         LaunchpadActivity.filterBox.setVisibility(View.INVISIBLE);
         LaunchpadActivity.clockoutBox.setVisibility(View.GONE);
         LaunchpadActivity.drawerBox.setVisibility(View.VISIBLE);
+
         TypeOut.typeoutBox.setVisibility(View.VISIBLE);
         TypeOut.findToggleView.setVisibility(View.GONE);
         TypeOut.editView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         TypeOut.typeoutView.setText(gestureShortcuts[getSwipeType].typeName);
-        if (gestureShortcuts[getSwipeType].shortcutPackage.length() >1) {
+
+        if (gestureShortcuts[getSwipeType].shortcutPackage.length() > 1) {
             TypeOut.editView.setVisibility(View.VISIBLE);
             TypeOut.typeoutView.append(" - ");
-            TypeOut.typeoutView.append(gestureShortcuts[getSwipeType].shortcutLabel );
-            TypeOut.editView.setText("  "); //make x button larger
-            TypeOut.editView.append(String.valueOf(Character.toChars(215))); //x button
-            TypeOut.editView.append(" "); //make x button larger
-        }//if (DrawKeypadBox.keypadButton[KeyPosition].ShortcutLabel.length()>1)
-        else {
+            TypeOut.typeoutView.append(gestureShortcuts[getSwipeType].shortcutLabel);
+            TypeOut.editView.setText("  "); // X button margin
+            TypeOut.editView.append(String.valueOf(Character.toChars(215))); // X button
+            TypeOut.editView.append(" "); // X button margin
+        } else {
             TypeOut.typeoutView.append(" - " + rClockout.getString(R.string.unassigned));
-            TypeOut.editView.setText(" "); //x button not needed if unassigned
-        } //else of if (DrawKeypadBox.keypadButton[KeyPosition].ShortcutLabel.length()>1)
+            TypeOut.editView.setText(" "); // X button not needed if unassigned
+        }
 
         allApps = global.getAllAppItems();
         LaunchpadActivity.drawDrawerBox.DrawBox(allApps);
 
         LaunchpadActivity.appGridView.setOnItemClickListener(new ClickSelectListener(getSwipeType));
         LaunchpadActivity.appGridView.setOnItemLongClickListener(new MenuLongClickNuller());
-
-    } //private void shorcutPicker(Integer getGesture)
+    }
 
     public class MenuLongClickNuller implements AdapterView.OnItemLongClickListener {
         @Override
         public boolean onItemLongClick(AdapterView<?> adapterView, View viewItem, int pos, long l) {
-            //do nothing
+            // Do nothing
             return true;
-        } //public boolean onItemLongClick(AdapterView<?> adapterView, View viewItem, int pos, long l)
-    } // public class MenuLongClickNuller implements OnItemLongClickListener
+        }
+    }
 
-
-    private class ClickSelectListener implements AdapterView.OnItemClickListener{
-
+    private class ClickSelectListener implements AdapterView.OnItemClickListener {
         int clickSwipeType;
 
-        public ClickSelectListener(int getSwipeType){
+        private ClickSelectListener(int getSwipeType) {
             clickSwipeType = getSwipeType;
         }
 
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
             gestureShortcuts[clickSwipeType].shortcutPackage = allApps[position].pkgname;
             gestureShortcuts[clickSwipeType].shortcutLabel = allApps[position].label;
             shortcutPicker(clickSwipeType);
 
             DBHelper dbHandler = new DBHelper(mainContext);
             dbHandler.AssignShorcut(clickSwipeType, allApps[position].pkgname);
+            dbHandler.close();
+        }
+    }
 
-        }// public void onItemClick(AdapterView<?> adapterView, View view, int position, long l)
-
-
-    } //private class ClickSelectListener implements AdapterView.OnItemClickListener
-
-
-    public void popSelectBox () {
-
+    private void popSelectBox() {
         AppItem[] menuItems;
         LaunchpadActivity.hideDrawerAllApps = false;
 
@@ -588,47 +525,43 @@ public class ClockOut {
 
         menuItems = new AppItem[4];
 
-        for (int menuInc=0; menuInc<menuItems.length; menuInc++) menuItems[menuInc] = new AppItem();
+        for (int menuInc = 0; menuInc < menuItems.length; menuInc++) {
+            menuItems[menuInc] = new AppItem();
+        }
 
-        menuItems[0].label=gestureShortcuts[UP_LEFTSIDE].typeName;
-        menuItems[1].label=gestureShortcuts[DN_LEFTSIDE].typeName;
-        menuItems[2].label=gestureShortcuts[UP_RIGHTSIDE].typeName;
-        menuItems[3].label=gestureShortcuts[DN_RIGHTSIDE].typeName;
+        menuItems[0].label = gestureShortcuts[UP_LEFTSIDE].typeName;
+        menuItems[1].label = gestureShortcuts[UP_RIGHTSIDE].typeName;
+        menuItems[2].label = gestureShortcuts[DN_LEFTSIDE].typeName;
+        menuItems[3].label = gestureShortcuts[DN_RIGHTSIDE].typeName;
 
         LaunchpadActivity.drawDrawerBox.DrawBox(menuItems);
         setPopMenuListener();
+    }
 
-    } //public LinearLayout DrawBox ()
-
-    public void setPopMenuListener() {
+    private void setPopMenuListener() {
         LaunchpadActivity.appGridView.setOnItemClickListener(new PopMenuClickListener());
         LaunchpadActivity.appGridView.setOnItemLongClickListener(new MenuLongClickNuller());
-    } //public void setPopMenuListener()
-
+    }
 
     private class PopMenuClickListener implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
             switch (position) {
                 case 0:
                     shortcutPicker(UP_LEFTSIDE);
                     break;
                 case 1:
-                    shortcutPicker(DN_LEFTSIDE);
+                    shortcutPicker(UP_RIGHTSIDE);
                     break;
                 case 2:
-                    shortcutPicker(UP_RIGHTSIDE);
+                    shortcutPicker(DN_LEFTSIDE);
                     break;
                 case 3:
                     shortcutPicker(DN_RIGHTSIDE);
                     break;
                 default:
                     break;
-            } //switch (position)
-
-        }// public void onItemClick(AdapterView<?> adapterView, View view, int position, long l)
-    } //private class PopMenuClickListener implements AdapterView.OnItemClickListener
-
-
-} //public class ClockOut
+            }
+        }
+    }
+}
