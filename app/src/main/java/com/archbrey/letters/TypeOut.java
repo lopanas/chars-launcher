@@ -2,7 +2,6 @@ package com.archbrey.letters;
 
 import android.content.Context;
 import android.content.Intent;
-
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.util.TypedValue;
@@ -13,138 +12,119 @@ import android.widget.TextView;
 
 import com.archbrey.letters.Preferences.SettingsActivity;
 
-
 public class TypeOut {
-
     public static RelativeLayout typeoutBox;
 
     public static TextView typeoutView;
     public static TextView editView;
-    public static TextView findToggleView;
+    static TextView findToggleView;
 
     private static Context mainContext;
-    private static Resources rTypeout;
 
     private GlobalHolder global;
 
+    static int TextSize = 24;
+    static boolean findStatus;
+    static int editMode;
 
-    public static int TextSize = 24;
-    public static boolean findStatus;
-    public static int editMode;
+    private static KeypadShortcuts keypadShortcutsHandle;
 
-    private static KeypadShortcuts keypadShortcustHandle;
-    private static FilterEdit filterEditHandle;
-
-    public TypeOut() {
-
-       // findStatus = false;
+    TypeOut() {
         global = new GlobalHolder();
+    }
 
-    } //public TypeOut(
+    public RelativeLayout getLayout() {
+        return typeoutBox;
+    }
 
-    public RelativeLayout getLayout() { return typeoutBox;
-    } // public LinearLayout getLayout()
+    public TextView getTypeoutView() {
+        return typeoutView;
+    }
 
-    public TextView getTypeoutView() { return typeoutView;
-    } //public LinearLayout getLayout()
+    boolean getFindStatus() {
+        return findStatus;
+    }
 
-    public boolean getFindStatus() { return findStatus;
-    } //public LinearLayout getLayout()
-
-    public void setFindStatus (boolean getFindStatus) {
-
-       // View drawerBox ;
+    public void setFindStatus(boolean getFindStatus) {
         SideButton delButton;
 
         int findToggleTextSize = 24;
         global = new GlobalHolder();
-       // drawerBox = global.getDrawerBox();
         delButton = global.getDelButton();
 
-            findStatus=getFindStatus;
+        findStatus = getFindStatus;
 
-            if (!findStatus){
-                findToggleView.setText(" find  ");
-                findToggleTextSize = 15;
-              //  drawerBox.setVisibility(View.INVISIBLE);
-              //  typeoutBox.setVisibility(View.INVISIBLE);
-              //  if (!LaunchpadActivity.isSetAsHome)
-              //      delButton.Key.setText(String.valueOf(Character.toChars(8595))); //"down" button
-              //  else
-                    delButton.Key.setText(String.valueOf(Character.toChars(8593)));//"up" button
-            } // if (!findStatus)
+        if (!findStatus) {
+            findToggleView.setText(mainContext.getString(R.string.find));
+            findToggleTextSize = 15;
+            //  drawerBox.setVisibility(View.INVISIBLE);
+            //  typeoutBox.setVisibility(View.INVISIBLE);
+            //  if (!LaunchpadActivity.isSetAsHome)
+            //      delButton.Key.setText(String.valueOf(Character.toChars(8595))); //"down" button
+            //  else
+
+            displayButton(delButton.Key, "arrowUp");
+        }
 
         findToggleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, findToggleTextSize);
+    }
 
-    } //public setFindStatus(boolean getFindStatus)
-
-    public void toggleFindStatus() {
-
-        View drawerBox ;
+    private void toggleFindStatus() {
         //SideButton delButton;
-
         int findToggleTextSize;
-
-        drawerBox = global.getDrawerBox();
-       // delButton = global.getDelButton();
+        View drawerBox = global.getDrawerBox();
+        // delButton = global.getDelButton();
 
         if (findStatus) {
             findStatus = false;
-            findToggleView.setText(" find  ");
+            findToggleView.setText(mainContext.getString(R.string.find));
             findToggleTextSize = 15;
             drawerBox.setVisibility(View.INVISIBLE);
             typeoutBox.setVisibility(View.GONE);
             LaunchpadActivity.clockoutBox.setVisibility(View.VISIBLE);
 
-          //  if (!LaunchpadActivity.isSetAsHome)
-          //      delButton.Key.setText(String.valueOf(Character.toChars(8595))); //"down" button
-          //  else
-                DrawKeypadBox.delButton.Key.setText(String.valueOf(Character.toChars(8593)));//"up" button
+            //  if (!LaunchpadActivity.isSetAsHome)
+            //      delButton.Key.setText(String.valueOf(Character.toChars(8595))); // "down" button
+            //  else
+
+            displayButton(DrawKeypadBox.delButton.Key, "arrowUp");
             LaunchpadActivity.prefsEditor.putBoolean("findStatus", false);
-        } //if (findStatus)
-        else {
+        } else {
             findStatus = true;
-            global.setFindString(""); //delete currently viewed letter before searching
+            global.setFindString(""); // Delete currently viewed letter before searching
             typeoutView.setText("");
-            findToggleView.setText(" "); //x button
-            findToggleView.append(String.valueOf(Character.toChars(215))); //x button
-            findToggleView.append("  "); //x button
+
             findToggleTextSize = 24;
-            DrawKeypadBox.delButton.Key.setText(String.valueOf(Character.toChars(8656)));//back button
+            displayButton(findToggleView, "close");
+            displayButton(DrawKeypadBox.delButton.Key, "arrowLeft");
             editView.setVisibility(View.GONE);
             LaunchpadActivity.prefsEditor.putBoolean("findStatus", true);
-
-        } //else of if (findStatus==true)
+        }
 
         LaunchpadActivity.prefsEditor.commit();
         findToggleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, findToggleTextSize);
+    }
 
-    } // public toggleFindStatus()
-
-
-   public RelativeLayout DrawBox(RelativeLayout getTypeoutBox,Context c,Resources getR){
-
+    public RelativeLayout DrawBox(RelativeLayout getTypeoutBox, Context c, Resources getR) {
         typeoutBox = getTypeoutBox;
         mainContext = c;
-        rTypeout = getR;
-
-        int typeoutTextSize;
-        int findToggleTextSize;
-
-        int horizontal_margin = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 5,
-                getR.getDisplayMetrics());
+//        Resources rTypeout = getR;
+//
+//        int typeoutTextSize;
+//
+//        int horizontal_margin = (int) TypedValue.applyDimension(
+//                TypedValue.COMPLEX_UNIT_DIP, 5, getR.getDisplayMetrics()
+//        );
 
         int vertical_margin = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 15,
-                getR.getDisplayMetrics());
+                TypedValue.COMPLEX_UNIT_DIP, 15, getR.getDisplayMetrics()
+        );
 
-       int touchview_width = (int) TypedValue.applyDimension(
-               TypedValue.COMPLEX_UNIT_DIP, 50,
-               getR.getDisplayMetrics());
+        int touchview_width = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 50, getR.getDisplayMetrics()
+        );
 
-
-        findToggleTextSize = 15;
+        int findToggleTextSize = 15;
         typeoutView = new TextView(mainContext);
         typeoutView.setText(" ");
         typeoutView.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -152,44 +132,47 @@ public class TypeOut {
         typeoutView.setTextColor(SettingsActivity.textColor);
 
         editView = new TextView(mainContext);
-        editView.setText("  "); //spacer to make the tap target larger
-        editView.append(String.valueOf(Character.toChars(177))); //plus minus button
-        editView.append("  "); //spacer
+        displayButton(editView, "plusMinus");
+
         editView.setGravity(Gravity.CENTER_HORIZONTAL);
         editView.setTextSize(TypedValue.COMPLEX_UNIT_SP, TextSize);
         editView.setTextColor(SettingsActivity.textColor);
 
         findToggleView = new TextView(mainContext);
-        if (findStatus) findToggleView.setText(" "+String.valueOf(Character.toChars(215)) +"  "); //x button
-            else findToggleView.setText(" find  ");
+
+        if (findStatus) displayButton(findToggleView, "close");
+        else findToggleView.setText(mainContext.getString(R.string.find));
 
         findToggleView.setGravity(Gravity.CENTER_HORIZONTAL);
         findToggleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, findToggleTextSize);
         findToggleView.setTextColor(SettingsActivity.textColor);
 
-
         RelativeLayout.LayoutParams typeoutParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT, //width
-                RelativeLayout.LayoutParams.WRAP_CONTENT); //height
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
 
-                typeoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                typeoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-                typeoutParams.setMargins(0, vertical_margin, 0, vertical_margin);
+        typeoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        typeoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+        typeoutParams.setMargins(0, vertical_margin, 0, vertical_margin);
 
-       RelativeLayout.LayoutParams editViewParams = new RelativeLayout.LayoutParams(
-                touchview_width, //width
-                RelativeLayout.LayoutParams.WRAP_CONTENT); //height
+        RelativeLayout.LayoutParams editViewParams = new RelativeLayout.LayoutParams(
+                touchview_width,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
 
-                editViewParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                editViewParams.addRule(RelativeLayout.CENTER_VERTICAL);
-             //   editViewParams.setMargins(0, 0, horizontal_margin, 0);
+        editViewParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        editViewParams.addRule(RelativeLayout.CENTER_VERTICAL);
+        //   editViewParams.setMargins(0, 0, horizontal_margin, 0);
 
         RelativeLayout.LayoutParams findToggleParams = new RelativeLayout.LayoutParams(
-                touchview_width, //width
-                RelativeLayout.LayoutParams.WRAP_CONTENT); //height
+                touchview_width,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+
         findToggleParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         findToggleParams.addRule(RelativeLayout.CENTER_VERTICAL);
-      //  findToggleParams.setMargins(horizontal_margin, vertical_margin, 0, vertical_margin);
+        //  findToggleParams.setMargins(horizontal_margin, vertical_margin, 0, vertical_margin);
 
         typeoutBox = new RelativeLayout(mainContext);
         typeoutBox.setBackgroundColor(SettingsActivity.backerColor);
@@ -198,146 +181,140 @@ public class TypeOut {
         typeoutBox.addView(findToggleView, findToggleParams);
         typeoutBox.addView(typeoutView, typeoutParams);
 
-       editView.setVisibility(View.GONE);
+        editView.setVisibility(View.GONE);
         return typeoutBox;
-
-    } //public void DrawBox(LinearLayout getTypeoutBox,Context c,Resources getR)
-
+    }
 
     public void setListener() {
+        findToggleView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                toggleFindStatus();
+            }
+        });
 
+        editView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // SetAppList setApps;
+                // setApps = new SetAppList();
+                // toggleFindStatus();
+                SelectMode();
+            }
+        });
 
+        typeoutView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                PackageManager pmForListener;
+                pmForListener = global.getPackageManager();
+                int selected = KeypadTouchListener.SelectedKeyButton;
+                String shortcutPackage = DrawKeypadBox.keypadButton[selected].ShortcutPackage;
 
-        findToggleView.setOnClickListener(
-                new View.OnClickListener() {
-                    public void onClick(View v) { //perform action of click
+                // Check if keypad has assigned shortcut
+                if ((shortcutPackage.length() > 1) && editMode == 1) {
+                    Intent launchIntent = pmForListener.getLaunchIntentForPackage(shortcutPackage);
 
-                        toggleFindStatus();
+                    if (launchIntent.resolveActivity(pmForListener) != null) {
+                        global.getMainContext().startActivity(launchIntent);
+                        LaunchpadActivity.drawerBox.setVisibility(View.GONE);
+                        typeoutBox.setVisibility(View.GONE);
+                        LaunchpadActivity.clockoutBox.setVisibility(View.VISIBLE);
+                    }
 
-                    } //public void OnClick(View v)
-                } //new Button.OnClickListener()
-        ); //findToggleView.Key.setOnClickListener
-
-        editView.setOnClickListener(
-                new View.OnClickListener() {
-                    public void onClick(View v) { //perform action of click
-                       //  SetAppList setApps;
-                       //  setApps = new SetAppList();
-                        //toggleFindStatus();
-                        SelectMode();
-                    } //public void OnClick(View v)
-                } //new Button.OnClickListener()
-        ); //findToggleView.Key.setOnClickListener
-
-        typeoutView.setOnClickListener(
-                new View.OnClickListener() {
-                    public void onClick(View v) { //perform action of click
-
-                        PackageManager pmForListener;
-                        pmForListener = global.getPackageManager();
-
-                        if ((DrawKeypadBox.keypadButton[KeypadTouchListener.SelectedKeyButton].ShortcutPackage.length() > 1)  &&
-                                editMode==1) { //check if keypad has assigned shortcut
-
-                            Intent launchIntent = pmForListener.getLaunchIntentForPackage(DrawKeypadBox.keypadButton[KeypadTouchListener.SelectedKeyButton].ShortcutPackage);
-                            if (launchIntent.resolveActivity(pmForListener) != null) {
-                                global.getMainContext().startActivity(launchIntent);
-                                LaunchpadActivity.drawerBox.setVisibility(View.GONE);
-                                typeoutBox.setVisibility(View.GONE);
-                                LaunchpadActivity.clockoutBox.setVisibility(View.VISIBLE);
-                            } //if (launchIntent.resolveActivity(pmForListener) != null)
-
-                            //  AppItem launched;
-                         //   launched = new AppItem();
-                         //   launched.pkgname = DrawKeypadBox.keypadButton[KeypadTouchListener.SelectedKeyButton].ShortcutPackage;
-                         //   launched.label = DrawKeypadBox.keypadButton[KeypadTouchListener.SelectedKeyButton].ShortcutLabel;
-                         //   launched.name = "blank";
-                         //   new GetAppList().addRecentApp(launched);
-
-                        } //if(keypadButton[SelectedKeyButton].ShortcutPackage.length()>1)
-                    } //public void OnClick(View v)
-                } //new Button.OnClickListener()
-        ); //findToggleView.Key.setOnClickListener
-
-
-    } //public void setListener()
-
+                    //  AppItem launched;
+                    //   launched = new AppItem();
+                    //   launched.pkgname = DrawKeypadBox.keypadButton[KeypadTouchListener.SelectedKeyButton].ShortcutPackage;
+                    //   launched.label = DrawKeypadBox.keypadButton[KeypadTouchListener.SelectedKeyButton].ShortcutLabel;
+                    //   launched.name = "blank";
+                    //   new GetAppList().addRecentApp(launched);
+                }
+            }
+        });
+    }
 
     private void SelectMode() {
-
-      //  AppItem allApps[];
-
-        if (TypeOut.editMode<10) {
-
+        if (TypeOut.editMode < 10) {
             LaunchpadActivity.drawerBox.setVisibility(View.VISIBLE);
             LaunchpadActivity.keypadBox.setVisibility(View.GONE);
             LaunchpadActivity.filterBox.setVisibility(View.INVISIBLE);
             TypeOut.findToggleView.setVisibility(View.GONE);
+        }
 
-            if (TypeOut.editMode == 1) {
-               // ShortcutSelect();
+        if (TypeOut.editMode >= 50) {
+            // ShortcutSelect();
+            ClockOut.gestureShortcuts[TypeOut.editMode].shortcutLabel = " ";
+            ClockOut.gestureShortcuts[TypeOut.editMode].shortcutPackage = " ";
+            deleteShortcut(TypeOut.editMode);
+            LaunchpadActivity.clockoutHandle.shortcutPicker(TypeOut.editMode);
+        }
+
+        switch (TypeOut.editMode) {
+            case 1:
                 editMode = 11;
-                keypadShortcustHandle = new KeypadShortcuts();
-                keypadShortcustHandle.DrawBox(mainContext);
-
-            }//if (TypeOut.editMode==1)
-
-            else if (TypeOut.editMode == 2) {
-               // FilterItemsSelect();
+                keypadShortcutsHandle = new KeypadShortcuts();
+                keypadShortcutsHandle.DrawBox(mainContext);
+                break;
+            case 2:
                 editMode = 12;
-                filterEditHandle = new FilterEdit();
+                FilterEdit filterEditHandle = new FilterEdit();
                 filterEditHandle.DrawBox(mainContext);
-
-            }//if (TypeOut.editMode==2)
-
-        } //if (TypeOut.editMode<10)
-
-        else {
-
-            if (TypeOut.editMode == 11) {
-                // ShortcutSelect();
-                int KeyPosition = KeypadTouchListener.SelectedKeyButton;
-
-                DrawKeypadBox.keypadButton[KeyPosition].ShortcutPackage = " ";
-                DrawKeypadBox.keypadButton[KeyPosition].ShortcutLabel = " ";
-                //need to delete database
-                DBHelper dbHandler = new DBHelper(mainContext);
-                dbHandler.DeleteShorcut(KeyPosition);
-
-                keypadShortcustHandle.DrawBox(mainContext);
-            }//if (TypeOut.editMode==11)
-
-            if (TypeOut.editMode == 12) {
+                break;
+            case 11:
+                int keyPosition = KeypadTouchListener.SelectedKeyButton;
+                DrawKeypadBox.keypadButton[keyPosition].ShortcutPackage = " ";
+                DrawKeypadBox.keypadButton[keyPosition].ShortcutLabel = " ";
+                deleteShortcut(keyPosition);
+                keypadShortcutsHandle.DrawBox(mainContext);
+                break;
+            case 12:
                 editMode = 17;
                 filterEditHandle = new FilterEdit();
                 filterEditHandle.DrawBox(mainContext);
-            }//if (TypeOut.editMode==12)
-            else if (TypeOut.editMode == 17) {
+                break;
+            case 17:
                 editMode = 12;
                 filterEditHandle = new FilterEdit();
                 filterEditHandle.DrawBox(mainContext);
-            }//if (TypeOut.editMode==12)
+                break;
+            default:
+                break;
+        }
+    }
 
-            if (TypeOut.editMode >= 50) {
-                // ShortcutSelect();
+    private void deleteShortcut(int shortcut) {
+        DBHelper dbHandlers = new DBHelper(mainContext);
+        dbHandlers.DeleteShorcut(shortcut);
+        dbHandlers.close();
+    }
 
-                ClockOut.gestureShortcuts[TypeOut.editMode].shortcutLabel = " ";
-                ClockOut.gestureShortcuts[TypeOut.editMode].shortcutPackage = " ";
-                //need to delete database
-                DBHelper dbHandler = new DBHelper(mainContext);
-                dbHandler.DeleteShorcut(TypeOut.editMode);
+    // TODO: this should be on its own class
+    private void displayButton(TextView textView, String iconName) {
+        displayButton(textView, iconName, true);
+    }
 
-                LaunchpadActivity.clockoutHandle.shortcutPicker(TypeOut.editMode);
+    private void displayButton(TextView textView, String iconName, Boolean margins) {
+        String icon;
 
-            }//if (TypeOut.editMode==11)
+        switch (iconName) {
+            case "arrowUp":
+                icon = String.valueOf(Character.toChars(8593)); // ↑
+                break;
+            case "arrowDown":
+                icon = String.valueOf(Character.toChars(8595)); // ↓
+                break;
+            case "arrowLeft":
+                icon = String.valueOf(Character.toChars(8656)); // ⇐
+                break;
+            case "close":
+                icon = String.valueOf(Character.toChars(215)); // ×
+                break;
+            case "plusMinus":
+                icon = String.valueOf(Character.toChars(177)); // ±
+                break;
+            default:
+                icon = iconName;
+                break;
+        }
 
-
-        } //else of /if (TypeOut.editMode<10)
-
-    } // public void SelectMode()
-
-
-
-
-
-} //public class TypeOut
+        if (margins) textView.setText(String.format("  %s  ", icon));
+        else textView.setText(icon);
+    }
+}
