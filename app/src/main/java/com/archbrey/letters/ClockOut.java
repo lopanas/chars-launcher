@@ -12,7 +12,7 @@ import android.graphics.Point;
 //import android.net.Uri;
 import android.os.Handler;
 import android.provider.Settings;
-import android.support.v4.view.MotionEventCompat;
+import androidx.core.view.MotionEventCompat;
 //import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -21,7 +21,6 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
