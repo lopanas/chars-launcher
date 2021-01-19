@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 //import android.content.res.Resources;
 import android.graphics.Typeface;
-import android.support.v4.view.MotionEventCompat;
+import androidx.core.view.MotionEventCompat;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
